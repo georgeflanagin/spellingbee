@@ -9,6 +9,8 @@ on Mac OS 11.6 and 12.0, Fedora 35, and RHEL 7 and 8. Assuming you have
 a spelling dictionary and know its location, it should also work on 
 Windows.
 
+For Mac and Linux, the default dictionary is used if none is specified.
+
 # Use
 
 ```
