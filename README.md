@@ -23,14 +23,17 @@ optional arguments:
   -l LETTERS, --letters LETTERS
                         Letters to use, either six letters, or seven with the required letter first.
   -m MIDDLE, --middle MIDDLE
-                        Middle letter```
+                        Middle letter
+```
 
 These two executions will produce the same result.
 
 
 
-```python bee.py --letters george --middle f 
-python bee.py --letters fgeorge``` 
+```
+python bee.py --letters george --middle f 
+python bee.py --letters fgeorge
+``` 
 
 Specifically, 
 
@@ -40,4 +43,5 @@ Specifically,
 'froe', 'frog', 'frore', 'geoff', 'goff', 'goffer', 'gofferer', 'goof', 
 'goofer', 'groff', 'ofer', 'offer', 'offeree', 'offerer', 'offeror', 'reef', 
 'reefer', 'refer', 'referee', 'referrer', 'reforge', 'reforger', 'reoffer', 
-'reroof', 'roof', 'roofer']```
+'reroof', 'roof', 'roofer']
+```
