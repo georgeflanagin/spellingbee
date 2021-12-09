@@ -81,7 +81,6 @@ if __name__ == '__main__':
         help="Be chatty about what is taking place -- on a scale of 0 to 3")
 
     myargs = parser.parse_args()
-    myargs.verbose and linuxutils.dump_cmdline(myargs)
 
     try:
         vm_callable = "{}_main".format(os.path.basename(__file__)[:-3])
