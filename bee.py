@@ -55,16 +55,13 @@ def bee_main(myargs:argparse.Namespace) -> int:
     else:
         r_letter = myargs.letters[0]
         letters = myargs.letters[1:]
+
     plenum = r_letter+letters
+    c_expression = re.compile(f"[{letters}]*{r_letter}[{plenum}]*")
 
-    expression = f"[{letters}]*{r_letter}[{plenum}]*"
-    c_expression = re.compile(expression)
-
-    results = list(_ for _ in words if c_expression.fullmatch(_))
-        
-    print(results)
-
+    print(sorted(tuple(_ for _ in words if c_expression.fullmatch(_))))
     return os.EX_OK
+
 
 if __name__ == '__main__':
     
@@ -75,10 +72,8 @@ if __name__ == '__main__':
         help="Name of the dictionary file.")
     parser.add_argument('-l', '--letters', type=str, required=True,
         help="Letters to use, either six letters, or seven with the required letter first.")
-    parser.add_argument('-m', '--middle', type=str, required=True,
-        help="Output file name")
-    parser.add_argument('-v', '--verbose', type=int, default=0, choices=(0, 1, 2, 3),
-        help="Be chatty about what is taking place -- on a scale of 0 to 3")
+    parser.add_argument('-m', '--middle', type=str, 
+        help="Middle letter")
 
     myargs = parser.parse_args()
 
