@@ -23,6 +23,7 @@ import re
 ###
 # From hpclib
 ###
+import linuxutils
 
 ###
 # Credits
@@ -49,6 +50,9 @@ def bee_main(myargs:argparse.Namespace) -> int:
     with open(myargs.dictionary) as f:
         words = tuple(_.lower() for _ in f.read().split('\n') if len(_) > 3)
 
+    if myargs.batch: 
+        return beehive(myargs, words)
+
     if myargs.middle:
         r_letter = myargs.middle
         letters = myargs.letters
@@ -63,11 +67,19 @@ def bee_main(myargs:argparse.Namespace) -> int:
     return os.EX_OK
 
 
+def beehive(myargs:argparse.Namespace, words:tuple) -> int:
+    return os.EX_OK
+
+
 if __name__ == '__main__':
     
     parser = argparse.ArgumentParser(prog="bee", 
         description="What bee does, bee does best.")
 
+    parser.add_argument('-b', '--batch', action='store_true',
+        help="test the entire dictionary')
+    parser.add_argument('--cpus', type=int, default=1,
+        help="number of cpus to use in batch mode.")
     parser.add_argument('-d', '--dictionary', type=str, default=default_word_list,
         help="Name of the dictionary file.")
     parser.add_argument('-l', '--letters', type=str, required=True,
