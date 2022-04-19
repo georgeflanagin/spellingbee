@@ -11,21 +11,33 @@ Windows.
 
 For Mac and Linux, the default dictionary is used if none is specified.
 
+# Parallel processing
+
+This branch is set up for parallel processing. The code will determine the
+number of available CPUs, and use them all, or exactly as many as you specify. 
+Included is the 20,000 word 
+dictionary based on the most common words in English. Outside of some 
+proper nouns, it tracks the NYTimes dictionary used with their SpellingBee
+program relatively well. 
+
 # Use
 
 ```
- bee [-h] [-d DICTIONARY] -l LETTERS [-m MIDDLE]
+usage: bee [-h] [-b] [--cpus CPUS] [-d DICTIONARY] [-l LETTERS] [-m MIDDLE] [-v]
 
 What bee does, bee does best.
 
 optional arguments:
   -h, --help            show this help message and exit
+  -b, --batch           test the entire dictionary
+  --cpus CPUS           number of cpus to use in batch mode.
   -d DICTIONARY, --dictionary DICTIONARY
                         Name of the dictionary file.
   -l LETTERS, --letters LETTERS
                         Letters to use, either six letters, or seven with the required letter first.
   -m MIDDLE, --middle MIDDLE
                         Middle letter
+  -v, --verbose         Be chatty about what is taking place.
 ```
 
 These two executions will produce the same result.
