@@ -66,7 +66,11 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     Try every pangram in the dictionary against the entire list of words.
     """
     num_cpus = cpucounter()
-    processors = min(num_cpus, myargs.cpus) if myargs.cpus else num_cpus
+    if not myargs.cpus:
+        processors = num_cpus
+    else:
+        processors = min(num_cpus, myargs.cpus)
+
     print(f"{processors=}")
 
     pangrams = tuple(_ for _ in words if len(set(_)) == 7)
