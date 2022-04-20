@@ -61,11 +61,11 @@ def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
 
     print(f"Child process {os.getpid()} is analyzing {len(pangrams)} pangrams.")
     for pangram in pangrams:
+        pangram = str(set(pangram))
         for i, required_letter in enumerate(pangram):
             other_letters = pangram[:i] + pangram[i+1:]
             expression = re.compile(f"[{other_letters}]*{required_letter}[{pangram}]*")
             matches = sorted(tuple(_ for _ in words if expression.fullmatch(_)))
-            verbose and print(f"{os.getpid()} :: {required_letter=} {other_letters=} {len(matches)=}")
 
     os._exit(0)
 
@@ -82,7 +82,7 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     else:
         processors = min(num_cpus, myargs.cpus)
 
-    print(f"{processors=}")
+    print(f"Using {processors} processors of the {num_cpus} available.")
 
     pangrams = tuple(_ for _ in words if len(set(_)) == 7)
     print(f"The dictionary contains {len(pangrams)} pangrams")    
@@ -111,10 +111,6 @@ def cpucounter() -> int:
         }
     return names[platform.platform().split('-')[0]]()
 
-
-print(f"This machine is running {platform.platform()}.")
-print(f"The total number of CPUs is {os.cpu_count()}.")
-print(f"The number of usable CPUs is {os.sched_getaffinity(0)}.")
 
 def splitter(group:Iterable, num_chunks:int) -> Iterable:
     """
@@ -167,6 +163,20 @@ def bee_main(myargs:argparse.Namespace) -> int:
     print(sorted(tuple(_ for _ in words if c_expression.fullmatch(_))))
     return os.EX_OK
 
+
+############################################################
+# print the stats for the current execution environment
+# before we start to run. These stats will be printed 
+# without regard to verbosity or whether the program is 
+# being run, or just the module imported.
+############################################################
+
+print(f"This machine is running {platform.platform()}.")
+print(f"The total number of CPUs is {os.cpu_count()=}.")
+print(f"The number of usable CPUs is {len(os.sched_getaffinity(0))=}.")
+print(f"PSUtil reports the number of logical CPUs is {psutil.cpu_count()}")
+print(f"PSUtil reports the number of physical CPUs is {psutil.cpu_count(False)}")
+print(f"PSUtil reports memory statistics of {psutil.virtual_memory()}")
 
 if __name__ == '__main__':
     
