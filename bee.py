@@ -21,6 +21,15 @@ import platform
 import re
 
 ###
+# Installed imports
+###
+try:
+    import psutil
+except ImportError as e:
+    print(f"Import error {e}")
+    sys.exit(os.EX_SOFTWARE)
+
+###
 # From hpclib
 ###
 
@@ -30,7 +39,7 @@ import re
 __author__ = 'George Flanagin'
 __copyright__ = 'Copyright 2021'
 __credits__ = None
-__version__ = 0.1
+__version__ = 0.9
 __maintainer__ = 'George Flanagin'
 __email__ = ['me@georgeflanagin.com', 'gflanagin@richmond.edu']
 __status__ = 'in progress'
@@ -65,6 +74,8 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     """
     Try every pangram in the dictionary against the entire list of words.
     """
+    global verbose
+
     num_cpus = cpucounter()
     if not myargs.cpus:
         processors = num_cpus
@@ -100,6 +111,10 @@ def cpucounter() -> int:
         }
     return names[platform.platform().split('-')[0]]()
 
+
+print(f"This machine is running {platform.platform()}.")
+print(f"The total number of CPUs is {os.cpu_count()}.")
+print(f"The number of usable CPUs is {os.sched_getaffinity(0)}.")
 
 def splitter(group:Iterable, num_chunks:int) -> Iterable:
     """
