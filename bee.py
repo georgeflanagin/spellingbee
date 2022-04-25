@@ -89,19 +89,14 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     """
     global verbose
 
-    num_cpus = cpucounter()
-    if not myargs.cpus:
-        processors = num_cpus
-    else:
-        processors = min(num_cpus, myargs.cpus)
-
-    print(f"Using {processors} processors of the {num_cpus} available.")
+    num_cpus = myargs.cpus if myargs.batch else 1
+    print(f"Using {num_cpus} processors.")
 
     pangrams = tuple(_ for _ in words if len(set(_)) == 7)
     print(f"The dictionary contains {len(pangrams)} pangrams")    
 
     mypids = set()
-    for block in splitter(pangrams, processors):
+    for block in splitter(pangrams, num_cpus):
         mypids.add(pid := os.fork())
         if pid: 
             continue
@@ -114,21 +109,6 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
         print(f"{child_pid=} has completed with {status=}")
 
     return os.EX_OK
-
-
-def cpucounter() -> int:
-    # Find out if we are running as a SLURM process.
-    slurm_process = False if os.environ.get('SLURM_JOB_ID') is None else True
-
-    names = {
-        'macOS': lambda : os.cpu_count(),
-        'Linux': lambda : len(os.sched_getaffinity(0)),
-        'Windows' : lambda : os.cpu_count()
-        }
-
-    return ( os.environ.get('SLURM_CPUS_PER_TASK', os.cpu_count()) 
-        if slurm_process else 
-        names[platform.platform().split('-')[0]]() )
 
 
 def splitter(group:Iterable, num_chunks:int) -> Iterable:
@@ -190,15 +170,13 @@ def bee_main(myargs:argparse.Namespace) -> int:
 # being run, or just the module imported.
 ############################################################
 
-print(f"This machine is running {platform.platform()}.")
-print(f"The total number of CPUs is {os.cpu_count()=}.")
-print(f"The number of usable CPUs is {len(os.sched_getaffinity(0))=}.")
-print(f"PSUtil reports the number of logical CPUs is {psutil.cpu_count()}")
-print(f"PSUtil reports the number of physical CPUs is {psutil.cpu_count(False)}")
-print(f"PSUtil reports memory statistics of {psutil.virtual_memory()}")
-print(f"The environment is set to {os.environ}")
-
-sys.exit(os.EX_OK)
+# print(f"This machine is running {platform.platform()}.")
+# print(f"The total number of CPUs is {os.cpu_count()=}.")
+# print(f"The number of usable CPUs is {len(os.sched_getaffinity(0))=}.")
+# print(f"PSUtil reports the number of logical CPUs is {psutil.cpu_count()}")
+# print(f"PSUtil reports the number of physical CPUs is {psutil.cpu_count(False)}")
+# print(f"PSUtil reports memory statistics of {psutil.virtual_memory()}")
+# print(f"The environment is set to {os.environ}")
 
 if __name__ == '__main__':
     
