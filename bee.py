@@ -1,4 +1,11 @@
 # -*- coding: utf-8 -*-
+
+"""
+Simple program that plays nytimes.com/spellingbee using a 
+dictionary of the user's choice and the rules of the game
+given on the website.
+"""
+
 import typing
 from   typing import *
 
@@ -53,10 +60,16 @@ elif this_os == 'Darwin':
 else:
     default_word_list = './words'
 
+# We will use a global verbose to control how chatty the
+# program is.
 verbose = False
 
 
 def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
+    """
+    Take some pangrams and see how many words we can find 
+    when using each one in the SpellingBee program.
+    """
     global verbose
 
     print(f"Child process {os.getpid()} is analyzing {len(pangrams)} pangrams.")
@@ -104,12 +117,18 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
 
 
 def cpucounter() -> int:
+    # Find out if we are running as a SLURM process.
+    slurm_process = False if os.environ.get('SLURM_JOB_ID') is None else True
+
     names = {
         'macOS': lambda : os.cpu_count(),
         'Linux': lambda : len(os.sched_getaffinity(0)),
         'Windows' : lambda : os.cpu_count()
         }
-    return names[platform.platform().split('-')[0]]()
+
+    return ( os.environ.get('SLURM_CPUS_PER_TASK', os.cpu_count()) 
+        if slurm_process else 
+        names[platform.platform().split('-')[0]]() )
 
 
 def splitter(group:Iterable, num_chunks:int) -> Iterable:
@@ -177,6 +196,9 @@ print(f"The number of usable CPUs is {len(os.sched_getaffinity(0))=}.")
 print(f"PSUtil reports the number of logical CPUs is {psutil.cpu_count()}")
 print(f"PSUtil reports the number of physical CPUs is {psutil.cpu_count(False)}")
 print(f"PSUtil reports memory statistics of {psutil.virtual_memory()}")
+print(f"The environment is set to {os.environ}")
+
+sys.exit(os.EX_OK)
 
 if __name__ == '__main__':
     
