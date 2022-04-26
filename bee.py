@@ -28,15 +28,6 @@ import platform
 import re
 
 ###
-# Installed imports
-###
-try:
-    import psutil
-except ImportError as e:
-    print(f"Import error {e}")
-    sys.exit(os.EX_SOFTWARE)
-
-###
 # From hpclib
 ###
 
@@ -162,21 +153,6 @@ def bee_main(myargs:argparse.Namespace) -> int:
     print(sorted(tuple(_ for _ in words if c_expression.fullmatch(_))))
     return os.EX_OK
 
-
-############################################################
-# print the stats for the current execution environment
-# before we start to run. These stats will be printed 
-# without regard to verbosity or whether the program is 
-# being run, or just the module imported.
-############################################################
-
-# print(f"This machine is running {platform.platform()}.")
-# print(f"The total number of CPUs is {os.cpu_count()=}.")
-# print(f"The number of usable CPUs is {len(os.sched_getaffinity(0))=}.")
-# print(f"PSUtil reports the number of logical CPUs is {psutil.cpu_count()}")
-# print(f"PSUtil reports the number of physical CPUs is {psutil.cpu_count(False)}")
-# print(f"PSUtil reports memory statistics of {psutil.virtual_memory()}")
-# print(f"The environment is set to {os.environ}")
 
 if __name__ == '__main__':
     
