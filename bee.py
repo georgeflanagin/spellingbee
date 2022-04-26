@@ -63,15 +63,20 @@ def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
     """
     global verbose
 
-    print(f"Child process {os.getpid()} is analyzing {len(pangrams)} pangrams.")
-    for pangram in pangrams:
-        pangram = str(set(pangram))
-        for i, required_letter in enumerate(pangram):
-            other_letters = pangram[:i] + pangram[i+1:]
-            expression = re.compile(f"[{other_letters}]*{required_letter}[{pangram}]*")
-            matches = sorted(tuple(_ for _ in words if expression.fullmatch(_)))
+    try:
+        print(f"Child process {os.getpid()} is analyzing {len(pangrams)} pangrams.")
+        for pangram in pangrams:
+            pangram = str(set(pangram))
+            for i, required_letter in enumerate(pangram):
+                other_letters = pangram[:i] + pangram[i+1:]
+                expression = re.compile(f"[{other_letters}]*{required_letter}[{pangram}]*")
+                matches = sorted(tuple(_ for _ in words if expression.fullmatch(_)))
 
-    os._exit(0)
+    except KeyboardInterrupt as e:
+        print("You pressed control-C")        
+
+    finally:
+        os._exit(0)
 
 
 def beehive(myargs:argparse.Namespace, words:tuple) -> int:
@@ -84,7 +89,7 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     print(f"Using {num_cpus} processors.")
 
     pangrams = tuple(_ for _ in words if len(set(_)) == 7)
-    print(f"The dictionary contains {len(pangrams)} pangrams")    
+    verbose and print(f"The dictionary contains {len(pangrams)} pangrams")    
 
     mypids = set()
     for block in splitter(pangrams, num_cpus):
@@ -133,10 +138,19 @@ def splitter(group:Iterable, num_chunks:int) -> Iterable:
 
 
 def bee_main(myargs:argparse.Namespace) -> int:
-    with open(myargs.dictionary) as f:
-        words = tuple(_.lower() for _ in f.read().split('\n') if len(_) > 3 and _.isalpha())
-    print(f"There are {len(words)} words in the dictionary.")
+    """
+    Examine the arguments to the program, and do the appropriate
+    things. First step is reading the dictionary.
+    """
+    global verbose
 
+    with open(myargs.dictionary) as f:
+        words = tuple(_.lower() for _ in f.read().split('\n') 
+            if len(_) > 3 and _.isalpha())
+    verbose and print(f"There are {len(words)} words in the dictionary.")
+
+    # If batch is set, we are not solving one spelling bee, 
+    # but all of them. 
     if myargs.batch: 
         return beehive(myargs, words)
 
@@ -161,9 +175,9 @@ if __name__ == '__main__':
 
     parser.add_argument('-b', '--batch', action='store_true',
         help="test the entire dictionary")
-    parser.add_argument('--cpus', type=int, default=0,
+    parser.add_argument('--cpus', type=int, default=1,
         help="number of cpus to use in batch mode.")
-    parser.add_argument('-d', '--dictionary', type=str, default=default_word_list,
+    parser.add_argument('-d', '--dict', '--dictionary', type=str, default=default_word_list,
         help="Name of the dictionary file.")
     parser.add_argument('-l', '--letters', type=str,
         help="Letters to use, either six letters, or seven with the required letter first.")
