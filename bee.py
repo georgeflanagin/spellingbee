@@ -26,6 +26,7 @@ if sys.version_info < min_py:
 import argparse
 import platform
 import re
+import time
 
 ###
 # From hpclib
@@ -54,6 +55,7 @@ else:
 # We will use a global verbose to control how chatty the
 # program is.
 verbose = False
+start_time = time.time()
 
 
 def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
@@ -85,7 +87,7 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     global verbose
 
     num_cpus = myargs.cpus if myargs.batch else 1
-    print(f"Using {num_cpus} processors.")
+    print(f"Using {num_cpus} processes.")
 
     pangrams = tuple(_ for _ in words if len(set(_)) == 7)
     verbose and print(f"The dictionary contains {len(pangrams)} pangrams")    
@@ -223,8 +225,12 @@ if __name__ == '__main__':
         ###
         vm_callable = f"{os.path.basename(__file__)[:-3]}_main"
         sys.exit(globals()[vm_callable](myargs))
+        
 
     except Exception as e:
         print(f"Unhandled exception {e}")
+
+    finally:
+        print(f"Elapsed time: {time.time()-start_time} seconds.")
 
 
