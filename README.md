@@ -1,6 +1,8 @@
 # spellingbee
 A simple program illustrating a solution to the NYTimes Spelling Bee daily puzzle.
 
+https://www.nytimes.com/puzzles/spelling-bee
+
 # TOC:
 - Requirements
 - Use to solve SpellingBee
@@ -70,7 +72,32 @@ available to.
 
 The easiest way to understand the effects of child processes and 
 available cores is to run the program using the `time` command. 
-In this example on a 12-core CPU, we see linear scaling. 
+In this example on a 12-core CPU, we see linear scaling. First with
+6 cores in use:
+
+```
+[~]: time python bee.py -b --cpus 6 --dict 20k.txt
+Using 6 processes.
+Child process 623871 is analyzing 547 pangrams.
+Child process 623872 is analyzing 546 pangrams.
+Child process 623873 is analyzing 546 pangrams.
+Child process 623874 is analyzing 546 pangrams.
+Child process 623875 is analyzing 546 pangrams.
+Child process 623876 is analyzing 546 pangrams.
+child_pid=623871 has completed with status=0
+child_pid=623872 has completed with status=0
+child_pid=623875 has completed with status=0
+child_pid=623873 has completed with status=0
+child_pid=623876 has completed with status=0
+child_pid=623874 has completed with status=0
+Elapsed time: 120.51243424415588 seconds.
+
+real	2m0.581s
+user	11m48.236s
+sys	0m0.049s
+```
+
+And then with the full 12:
 
 ```
 [~]: time python bee.py -b --cpus 12 --dict 20k.txt
