@@ -68,8 +68,7 @@ def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
         for pangram in pangrams:
             pangram = str(set(pangram))
             for i, required_letter in enumerate(pangram):
-                other_letters = pangram[:i] + pangram[i+1:]
-                expression = re.compile(f"[{other_letters}]*{required_letter}[{pangram}]*")
+                expression = build_regex(required_letter, pangram[:i] + pangram[i+1:])
                 matches = sorted(tuple(_ for _ in words if expression.fullmatch(_)))
 
     except KeyboardInterrupt as e:
@@ -107,6 +106,14 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     return os.EX_OK
 
 
+def build_regex(required_letter:str, other_letters:str) -> re.Pattern:
+    """
+    Build the regex that represents the puzzle: 
+    """
+    all_letters = required_letter + other_letters
+    return re.compile(f"[{other_letters}]*{required_letter}[{all_letters}]*")
+
+
 def splitter(group:Iterable, num_chunks:int) -> Iterable:
     """
     Generator to divide a collection into num_chunks pieces.
@@ -120,6 +127,14 @@ def splitter(group:Iterable, num_chunks:int) -> Iterable:
         for chunk in splitter(group, num_chunks):
             ... do something with chunk ...
 
+    Full test program:
+
+        s = "nowisthewinterofourdiscontent"
+        l = list(s)
+        t = tuple(s)
+        d = dict(zip(s, range(len(s))))
+
+        print([ group for bag in (s, l, t, d) for group in splitter(bag, 5)])
     """
 
     quotient, remainder = divmod(len(group), num_chunks)
@@ -144,13 +159,20 @@ def bee_main(myargs:argparse.Namespace) -> int:
     """
     global verbose
 
-    with open(myargs.dictionary) as f:
+    ###
+    # Not knowing exactly what is in the dictionary, we want only the 
+    # all-alpha words that are 4 or more letters long. Change everything
+    # to lower case.
+    ###
+    with open(myargs.dict) as f:
         words = tuple(_.lower() for _ in f.read().split('\n') 
             if len(_) > 3 and _.isalpha())
     verbose and print(f"There are {len(words)} words in the dictionary.")
 
+    ###
     # If batch is set, we are not solving one spelling bee, 
     # but all of them. 
+    ###
     if myargs.batch: 
         return beehive(myargs, words)
 
@@ -161,10 +183,9 @@ def bee_main(myargs:argparse.Namespace) -> int:
         r_letter = myargs.letters[0]
         letters = myargs.letters[1:]
 
-    plenum = r_letter+letters
-    c_expression = re.compile(f"[{letters}]*{r_letter}[{plenum}]*")
-
+    c_expression = build_regex(r_letter, letters)
     print(sorted(tuple(_ for _ in words if c_expression.fullmatch(_))))
+
     return os.EX_OK
 
 
@@ -174,10 +195,10 @@ if __name__ == '__main__':
         description="What bee does, bee does best.")
 
     parser.add_argument('-b', '--batch', action='store_true',
-        help="test the entire dictionary")
+        help="find all the pangrams in the dictionary, and test all the circular shifts of for the spelling bee words.")
     parser.add_argument('--cpus', type=int, default=1,
-        help="number of cpus to use in batch mode.")
-    parser.add_argument('-d', '--dict', '--dictionary', type=str, default=default_word_list,
+        help="number of cpus to use in batch mode, assuming one process per core.")
+    parser.add_argument('-d', '--dict', type=str, default=default_word_list,
         help="Name of the dictionary file.")
     parser.add_argument('-l', '--letters', type=str,
         help="Letters to use, either six letters, or seven with the required letter first.")
@@ -196,7 +217,11 @@ if __name__ == '__main__':
     verbose = myargs.verbose
 
     try:
-        vm_callable = "{}_main".format(os.path.basename(__file__)[:-3])
+        ###
+        # Find the name of the _main function in this file, and
+        # start the program by calling it with myargs.
+        ###
+        vm_callable = f"{os.path.basename(__file__)[:-3]}_main"
         sys.exit(globals()[vm_callable](myargs))
 
     except Exception as e:
