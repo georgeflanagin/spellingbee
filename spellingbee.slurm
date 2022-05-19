@@ -5,7 +5,7 @@
 #SBATCH --mem=10G
 
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user=gflanagi@richmond.edu
+#SBATCH --mail-user=yournetid@richmond.edu
 
 echo "I ran on: $SLURM_NODELIST"
 echo "Starting at `date`"
