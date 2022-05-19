@@ -5,12 +5,12 @@
 #SBATCH --mem=10G
 
 #SBATCH --mail-type=ALL
-#SBATCH --mail-user="gflanagi@richmond.edu"
+#SBATCH --mail-user=gflanagi@richmond.edu
 
 echo "I ran on: $SLURM_NODELIST"
 echo "Starting at `date`"
 
-cd ~/spellingbee
-/usr/bin/time python bee.py --cpus 100 --batch -d 20k.txt
+cd ~/demoproject
+/usr/bin/time python bee.py --cpus 50 --batch -d 20k.txt
 
 echo "Finished at `date`"
