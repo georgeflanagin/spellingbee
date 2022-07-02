@@ -2,6 +2,11 @@
 
 Credit: https://nytimes.com/spellingbee
 
+NB: You are looking at the `master` branch. Be sure to take a look at the 
+other branch, `parallel`. It solves all possible Spelling Bee puzzles 
+by distributing the work among multiple processors. It is a nice use of
+`fork` and `wait`, as well as the read-only nature of the dictionary.
+
 **TL;DR version** --- *build words at least 4 letters long from a set of 7 letters,
 where one of them is required. There is never an `S` in the set, and there is
 at least one word that contains all seven letters (the "pangram").*
@@ -37,8 +42,6 @@ Regular expression grammar is never frustrated.
 On July 2, 2022 the pangram was **CAPITOL** with the **P** being the required 
 letter. The regex that represents the puzzle (ignoring the length > 3 constraint) 
 is `[caitol]*p[capitol]*`
-
-
 
 # Requirements
 
