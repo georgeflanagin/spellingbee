@@ -2,22 +2,43 @@
 
 Credit: https://nytimes.com/spellingbee
 
-TL;DR version --- build words at least 4 letters long from a set of 7 letters,
+**TL;DR version** --- *build words at least 4 letters long from a set of 7 letters,
 where one of them is required. There is never an `S` in the set, and there is
-at least one word that contains all seven letters (the "pangram").
+at least one word that contains all seven letters (the "pangram").*
 
 The Spelling Bee has given me many opportunities to spread the word about Python.
 There are a number of trivial questions about Spelling Bee that can be answered
 by a one-line Python statement, and that is itself an interesting property of 
 both the puzzle and Python.
 
-For example .. What is the longest pangram?
+A simple question first .. **How many pangrams are there in the dictionary?**
+
+```python
+sum(1 for w in open('/usr/share/dict/linux.words').read().lower().split() 
+    if len(set(w)) == 7 and 's' not in w)
+```
+
+And while we are on the subject of pangrams, .. **What is the longest pangram?**
 
 ```python
 max((len(w), w) 
-    for w in open('/usr/share/dict/linux.words').read().split()
+    for w in open('/usr/share/dict/linux.words').read().lower().split()
         if len(set(w)) == 7 and 's' not in w)
 ```
+
+In both examples, note the use of multiple generators, and the exploitation (?) of the property 
+of tuples that `t1 > t2` *iff* `t1[0] > t2[0]`.
+
+Spelling Bee is remarkable in that it contrasts the nature of human cognition
+with the algorithms of programming. It is easy to get "stuck" in Spelling Bee,
+and your mind begins to fixate on finding another word that starts with 'P'. 
+
+Regular expression grammar is never frustrated. 
+On July 2, 2022 the pangram was **CAPITOL** with the **P** being the required 
+letter. The regex that represents the puzzle (ignoring the length > 3 constraint) 
+is `[caitol]*p[capitol]*`
+
+
 
 # Requirements
 
