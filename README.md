@@ -32,7 +32,7 @@ max((len(w), w)
 ```
 
 In both examples, note the use of multiple generators, and the exploitation (?) of the property 
-of tuples that `t1 > t2` *iff* `t1[0] > t2[0]`.
+of tuples that *if* `t1[0] > t2[0]` *then* `t1 > t2`
 
 Spelling Bee is remarkable in that it contrasts the nature of human cognition
 with the algorithms of programming. It is easy to get "stuck" in Spelling Bee,
