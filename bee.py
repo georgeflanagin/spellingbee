@@ -296,7 +296,7 @@ if __name__ == '__main__':
         description="What bee does, bee does best.")
 
     parser.add_argument('-b', '--batch', action='store_true',
-        help="find all the pangrams in the dictionary, and test all the circular shifts of for the spelling bee words.")
+        help="find all the pangrams in the dictionary, and test all the circular shifts of each pangram for the spelling bee words.")
 
     parser.add_argument('--cpus', type=int, default=1,
         help="number of cpus to use in batch mode, assuming one process per core.")
@@ -346,5 +346,4 @@ if __name__ == '__main__':
 
     finally:
         print(f"Elapsed time: {time.time()-start_time} seconds.")
-
 

@@ -7,6 +7,7 @@ https://www.nytimes.com/puzzles/spelling-bee
 - Requirements
 - Use to solve SpellingBee
 - Parallel processing
+- ``with-db`` branch
 
 # Requirements
 
@@ -188,3 +189,33 @@ real	1m4.525s
 user	25m29.045s
 sys	0m0.418s
 ```
+
+# with-db branch
+
+Any filtering of the dictionary should be done first. The project now
+has two "bee" dictionaries that are already filtered.
+
+A SQLite3 database is used to store the results. The parameters are now:
+
+```
+usage: bee [-h] [-b] [--cpus CPUS] [-d DICT] [--db DB] [-l LETTERS] [-m MIDDLE] [-v]
+
+What bee does, bee does best.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -b, --batch           find all the pangrams in the dictionary, and test 
+                        all the circular shifts of
+                        each pangram for the spelling bee words.
+  --cpus CPUS           number of cpus to use in batch mode, assuming one process per core.
+  -d DICT, --dict DICT  Name of the dictionary file.
+  --db DB               Name of the database to which to write the results.
+  -l LETTERS, --letters LETTERS
+                        Letters to use, either six letters, or seven with the required 
+                        letter first.
+  -m MIDDLE, --middle MIDDLE
+                        Middle letter
+  -v, --verbose         Be chatty about what is taking place.
+```
+
+
