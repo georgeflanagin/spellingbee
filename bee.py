@@ -39,7 +39,7 @@ import sqlitedb
 # Credits
 ###
 __author__ = 'George Flanagin'
-__copyright__ = 'Copyright 2021'
+__copyright__ = 'Copyright 2022'
 __credits__ = None
 __version__ = 0.95
 __maintainer__ = 'George Flanagin'
