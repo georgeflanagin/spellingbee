@@ -80,9 +80,10 @@ def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
         for pangram in pangrams:
             pangram = "".join(set(pangram))
             db and db.execute_SQL("BEGIN EXCLUSIVE TRANSACTION")
-            for i, required_letter in enumerate(pangram):
-                expression = build_regex(required_letter, pangram[:i] + pangram[i+1:])
-                matches = sorted(tuple(_ for _ in words if expression.fullmatch(_)))
+            expression = re.compile(f"[{pangram}]*")
+            all_matches = set(_ for _ in words if expression.fullmatch(_))
+            for required_letter in pangram:
+                matches = tuple(word for word in all_matches if required_letter in word)
                 db and write_results(required_letter, "".join(sorted(pangram)), matches)
             db and robust_commit()
 
@@ -155,14 +156,6 @@ def build_dict(filename:str) -> int:
                 print(word)
 
     return len(words)
-
-
-def build_regex(required_letter:str, other_letters:str) -> re.Pattern:
-    """
-    Build the regex that represents the puzzle: 
-    """
-    all_letters = required_letter + other_letters
-    return re.compile(f"[{other_letters}]*{required_letter}[{all_letters}]*")
 
 
 def read_whitespace_file(filename:str) -> tuple:
