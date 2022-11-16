@@ -83,7 +83,7 @@ def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
             for i, required_letter in enumerate(pangram):
                 expression = build_regex(required_letter, pangram[:i] + pangram[i+1:])
                 matches = sorted(tuple(_ for _ in words if expression.fullmatch(_)))
-                db and write_results(required_letter, pangram, matches)
+                db and write_results(required_letter, "".join(sorted(pangram)), matches)
             db and robust_commit()
 
     except KeyboardInterrupt as e:
