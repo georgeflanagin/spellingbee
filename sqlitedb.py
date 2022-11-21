@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-    This is a base class for manipulating all sqlite databases.
+    This is a base class for manipulating all sqlite databases. It 
+    includes locking to allow multiprocess and multithreaded 
+    operation from Python programs.
 """
 
 
@@ -11,7 +13,7 @@
 __author__ =        'George Flanagin'
 __copyright__ =     'Copyright 2017 George Flanagin'
 __credits__ =       'None. This idea has been around forever.'
-__version__ =       '1.0'
+__version__ =       '2.2'
 __maintainer__ =    'George Flanagin'
 __email__ =         'me+git@georgeflanagin.com'
 __status__ =        'continual development.'
@@ -229,11 +231,12 @@ class SQLiteDB:
             with self.lock:
                 self.db.commit()
             return True
+
         except:
             return False
 
 
-    #@trap
+    @trap
     def execute_SQL(self, SQL:str, *args, **kwargs) -> object:
         """
         Wrapper that automagically returns rowsets for SELECTs and 
@@ -246,7 +249,7 @@ class SQLiteDB:
         """ 
         global we_have_pandas
        
-        docommit = kwargs.get('transaction') is None
+        docommit = kwargs.get('transaction') is True
         is_select = SQL.strip().lower().startswith('select')
         has_args = not not args
 
