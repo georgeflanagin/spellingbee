@@ -139,14 +139,24 @@ def build_dict(filename:str) -> int:
     the suffix .bee in $PWD.
     """
 
+    ###
     # We are not going for efficiency here. This is only executed
     # once, and after this step the new file is the one used, and
     # it assumed to be correct.
+    #
+    # NYTimes has these rules for Spelling Bee rules.
+    #   4+ letters
+    #   no s
+    #   just letters.
+    #   no proper nouns.
+    #   no more than 7 unique letters per word.
+    ###
     words = tuple(word for word in read_whitespace_file(filename) 
-        if len(word) > 3 and 
-        word.islower() and 
+        if 's' not in word and
+        len(word) > 3 and
+        word.islower() and
         word.isalpha() and
-        's' not in word)
+        len(set(word)) < 8)
 
     print(f"{len(words)=}")
 
