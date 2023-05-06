@@ -167,6 +167,12 @@ def build_dict(filename:str) -> int:
 
     return len(words)
 
+def build_regex(required_letter:str, other_letters:str) -> re.Pattern:
+    """
+    Build the regex that represents the puzzle:
+    """
+    all_letters = required_letter + other_letters
+    return re.compile(f"[{other_letters}]*{required_letter}[{all_letters}]*")
 
 def read_whitespace_file(filename:str) -> tuple:
     """
