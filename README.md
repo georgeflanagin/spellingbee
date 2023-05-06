@@ -13,7 +13,7 @@ https://www.nytimes.com/puzzles/spelling-bee
 
 Python 3.8 or later is required. No libraries outside the Python core
 distro are required. The program has been tested (well, executed anyway)
-on Mac OS 11.6 and 12.0, Fedora 35, and RHEL 7, 8, and Centos 9. Assuming
+on Mac OS 11.6 and 12.0, Fedora 35, and Enterprise Linux 7, 8, and 9. Assuming
 you have a spelling dictionary and know its location, it should also
 work on Windows.
 
@@ -69,7 +69,7 @@ NYTimes dictionary used with their SpellingBee program relatively well.
 
 `--cpus` determines the number of child processes. You can request any
 number that you want to use, including exceeding the number of cores
-available to. 
+available to the program. 
 
 The easiest way to understand the effects of child processes and 
 available cores is to run the program using the `time` command. 
