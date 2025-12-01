@@ -3,19 +3,25 @@ import typing
 from typing import *
 
 """
-These decorators are designed to handle hard errors in operation
-and provide a stack unwind and dump.
+This decorator handles hard errors in operation
+and provides a stack unwind and dump. The dumps
+are tagged with the PID of the crashed process, and
+put in a directory under $PWD whose name is today's
+date.
 
-from urdecorators import show_exceptions_and_frames as trap
-# from urdecorators import null_decorator as trap
+Usage:
 
-In production, we can swap the commented line for the one 
-preceding it. 
+    from trap import trap
+
+    @trap
+    def foo( ... ):
+        ..etc..
 
 """
 import os
 import sys
-min_py = (3,8)
+min_py = (3, 6)
+
 if sys.version_info < min_py:
     print(f"This program requires Python {min_py[0]}.{min_py[1]}, or higher.")
     sys.exit(os.EX_SOFTWARE)
@@ -23,40 +29,32 @@ if sys.version_info < min_py:
 ##
 # Standard imports
 ##
-import bdb
 import contextlib
 import datetime
 from   functools import wraps
 import inspect
+import threading
 
 ###
 # An optional import for better printing.
 ###
 try:
     from tabulate import tabulate
-    use_tabulate = True
+    have_tabulate = True
 except ImportError as e:
-    use_tabulate = False
+    have_tabulate = False
 
 
 
 # Credits
 __author__ = 'George Flanagin'
-__copyright__ = 'Copyright 2019, George Flanagin'
-__credits__ = 'Based on Github Gist 1148066 by diosmosis'
-__version__ = '0.1'
-__maintainer__ = 'Alina Enikeeva'
+__copyright__ = 'Copyright 2025, George Flanagin'
+__credits__ = [ 'Based on Github Gist 1148066 by diosmosis', 'Alina Enikeeva' ]
+__version__ = '1.1'
+__maintainer__ = 'George Flanagin'
 __email__ = 'me@georgeflanagin.com'
 __status__ = 'Production'
 __license__ = 'MIT'
-__required_version__ = (3,8)
-
-def null_decorator(o:object) -> object:
-    """
-    The big nothing.
-    """
-    return o
-
 
 def printvars(f_locals:dict) -> None:
     """
@@ -64,19 +62,19 @@ def printvars(f_locals:dict) -> None:
     available, we can print a nice looking table.
     """
 
-    global use_tabulate
-    if use_tabulate:
+    global have_tabulate
+    if have_tabulate:
         ###
         # Note: if tabulate doesn't work or cannot handle
         # our data, then we want to print something. Note
-        # that if the try/except has no problem, this 
+        # that if the try/except has no problem, this
         # function returns. Otherwise, it prints the
-        # stack frame more crudely, w/o formatting. 
+        # stack frame more crudely, w/o formatting.
         ###
-        as_list = [ [k, v] for k, v in f_locals.items() ]
+        as_list = [ [k, type(v).__name__, v] for k, v in f_locals.items() ]
         try:
-            print(tabulate(as_list, 
-                headers=['object', 'value'], 
+            print(tabulate(as_list,
+                headers=['object', 'type', 'value'],
                 tablefmt='orgtbl'))
 
         except:
@@ -86,14 +84,14 @@ def printvars(f_locals:dict) -> None:
 
     for k, v in f_locals.items():
         try:
-            print(f'    {k} = {v}')
+            print(f'    {k} = {str(v)}')
         except:
             print(f"Unable to print the value of {k}")
 
     return
 
 
-def show_exceptions_and_frames(func:object) -> None:
+def trap(func:object) -> None:
     """
     Print the names and values of each object in each stack frame.
     """
@@ -104,7 +102,7 @@ def show_exceptions_and_frames(func:object) -> None:
         # the stack to this function. Clearly, we have gone far enough,
         # and we can stop.
         __wrapper_marker_local__ = None
-    
+
         try:
             # If you want to get a flow trace, uncomment the next
             # line, and you will get the name of each function called
@@ -125,11 +123,12 @@ def show_exceptions_and_frames(func:object) -> None:
             new_dir = os.path.join(os.getcwd(), today)
             os.makedirs(new_dir, exist_ok=True)
 
-            # The file name will be the pid under the $PWD/today's-date 
+            # The file name will be the pid under the $PWD/today's-date
             # directory.
-            candidate_name = os.path.join(new_dir, pid)
-            
-            sys.stderr.write(f"writing dump to file {candidate_name}")
+            candidate_name = os.path.join(new_dir, 
+                f"{pid}-{datetime.datetime.now().isoformat()}")
+
+            sys.stderr.write(f"writing dump to file {candidate_name}\n")
 
             with open(candidate_name, 'a') as f:
                 with contextlib.redirect_stdout(f):
@@ -140,12 +139,12 @@ def show_exceptions_and_frames(func:object) -> None:
                         print(f"Exception while unwinding the stack: {e}")
 
                     print(f'Exception raised {e_type}: "{e_val}"')
-                    
+
                     # iterate through the frames in reverse order so we print the
                     # most recent frame first
-                    for frame_info in inspect.getinnerframes(e_trace):
+                    for frame_info in reversed(inspect.getinnerframes(e_trace)):
                         f_locals = frame_info[0].f_locals
-                
+
                         # if there's a local variable named __wrapper_marker_local__, we assume
                         # the frame is from a call of this function, 'wrapper', and we skip
                         # it. The problem happened before the dumping function was called.
@@ -159,12 +158,9 @@ def show_exceptions_and_frames(func:object) -> None:
                         printvars(f_locals)
 
                     print('\n')
-            sys.exit(-1)
+            sys.exit(os.EX_DATAERR)
 
     return wrapper
-
-# trap = null_decorator
-trap = show_exceptions_and_frames
 
 if __name__=="__main__":
 

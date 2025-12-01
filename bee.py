@@ -39,9 +39,9 @@ import sqlitedb
 # Credits
 ###
 __author__ = 'George Flanagin'
-__copyright__ = 'Copyright 2022'
+__copyright__ = 'Copyright 2022, 2025'
 __credits__ = None
-__version__ = 0.95
+__version__ = 1.1
 __maintainer__ = 'George Flanagin'
 __email__ = ['me@georgeflanagin.com', 'gflanagin@richmond.edu']
 __status__ = 'in progress'
