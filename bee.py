@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 """
-Simple program that plays nytimes.com/spellingbee using a 
+Simple program that plays nytimes.com/spellingbee using a
 dictionary of the user's choice and the rules of the game
 given on the website.
 """
@@ -66,11 +66,11 @@ verbose = False
 
 def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
     """
-    Take some pangrams and see how many words we can find 
+    Take some pangrams and see how many words we can find
     when using each one in the SpellingBee program.
 
     For each pangram, we successively treat each letter
-    as the middle one as the inner for-loop runs. 
+    as the middle one as the inner for-loop runs.
     """
     global verbose
     global db
@@ -88,7 +88,7 @@ def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
             db and robust_commit()
 
     except KeyboardInterrupt as e:
-        print("You pressed control-C")        
+        print("You pressed control-C")
 
     finally:
         db.close()
@@ -107,16 +107,16 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
     print(f"Using {num_cpus} processes.")
 
     pangrams = tuple(_ for _ in words if len(set(_)) == 7)
-    verbose and print(f"The dictionary contains {len(pangrams)} pangrams")    
+    verbose and print(f"The dictionary contains {len(pangrams)} pangrams")
 
     mypids = set()
     for block in splitter(pangrams, num_cpus):
         pid = os.fork()
-        if pid: 
+        if pid:
             mypids.add(pid)
         else:
             # These objects are distinct in the child processes. Each
-            # child has its own lock instance that references the 
+            # child has its own lock instance that references the
             # the singleton lock.
             mypid = os.getpid()
             mylock = multiprocessing.RLock()
@@ -134,8 +134,8 @@ def beehive(myargs:argparse.Namespace, words:tuple) -> int:
 def build_dict(filename:str) -> int:
     """
     Take any file of words that is presumably a 'dictionary'
-    of some whitespace delimited collection of words. Apply 
-    the NYTimes rules of the game, and write the file with 
+    of some whitespace delimited collection of words. Apply
+    the NYTimes rules of the game, and write the file with
     the suffix .bee in $PWD.
     """
 
@@ -150,10 +150,10 @@ def build_dict(filename:str) -> int:
     #   just letters.
     #   no proper nouns.
     #   no more than 7 unique letters per word.
-    #  
-    # There is an additional constraint that 
+    #
+    # There is an additional constraint that
     ###
-    words = tuple(word for word in read_whitespace_file(filename) 
+    words = tuple(word for word in read_whitespace_file(filename)
         if 's' not in word and
         len(word) > 3 and
         word.islower() and
@@ -178,7 +178,7 @@ def build_regex(required_letter:str, other_letters:str) -> re.Pattern:
 
 def read_whitespace_file(filename:str) -> tuple:
     """
-    This is a generator that returns the whitespace delimited tokens 
+    This is a generator that returns the whitespace delimited tokens
     in a text file, one token at a time.
     """
     if not filename: return tuple()
@@ -189,7 +189,7 @@ def read_whitespace_file(filename:str) -> tuple:
 
     f = open(filename)
     yield from (" ".join(f.read().split('\n'))).split()
-    
+
 
 def robust_commit() -> None:
     global db
@@ -203,7 +203,7 @@ def robust_commit() -> None:
     finally:
         mylock.release()
 
-        
+
 
 def splitter(group:Iterable, num_chunks:int) -> Iterable:
     """
@@ -230,7 +230,7 @@ def splitter(group:Iterable, num_chunks:int) -> Iterable:
 
     quotient, remainder = divmod(len(group), num_chunks)
     is_dict = isinstance(group, dict)
-    if is_dict: 
+    if is_dict:
         group = tuple(kvpair for kvpair in group.items())
 
     for i in range(num_chunks):
@@ -262,7 +262,7 @@ def write_results(letter:str, pangram:str, results:tuple) -> bool:
 
     finally:
         mylock.release()
-        
+
     return True
 
 
@@ -282,10 +282,10 @@ def bee_main(myargs:argparse.Namespace) -> int:
     verbose and print(f"Spelling Bee for {len(words)} words.")
 
     ###
-    # If batch is set, we are not solving one spelling bee, 
-    # but all of them. 
+    # If batch is set, we are not solving one spelling bee,
+    # but all of them.
     ###
-    if myargs.batch: 
+    if myargs.batch:
         return beehive(myargs, words)
 
     if myargs.middle:
@@ -302,8 +302,8 @@ def bee_main(myargs:argparse.Namespace) -> int:
 
 
 if __name__ == '__main__':
-    
-    parser = argparse.ArgumentParser(prog="bee", 
+
+    parser = argparse.ArgumentParser(prog="bee",
         description="What bee does, bee does best.")
 
     parser.add_argument('-b', '--batch', action='store_true',
@@ -321,7 +321,7 @@ if __name__ == '__main__':
     parser.add_argument('-l', '--letters', type=str,
         help="Letters to use, either six letters, or seven with the required letter first.")
 
-    parser.add_argument('-m', '--middle', type=str, 
+    parser.add_argument('-m', '--middle', type=str,
         help="Middle letter")
 
     parser.add_argument('-v', '--verbose', action='store_true',
@@ -337,8 +337,7 @@ if __name__ == '__main__':
     verbose = myargs.verbose
 
     try:
-        db = sqlitedb.SQLiteDB(myargs.db)
-        db.execute_SQL("pragma journal_mode=wal")
+        db = sqlitedb.SQLiteDB(myargs.db, workload="write_heavy")
     except:
         db = None
         print(f"{myargs.db} not found or is not a database.")
@@ -350,7 +349,7 @@ if __name__ == '__main__':
         ###
         vm_callable = f"{os.path.basename(__file__)[:-3]}_main"
         sys.exit(globals()[vm_callable](myargs))
-        
+
 
     except Exception as e:
         print(f"Unhandled exception {e}")
