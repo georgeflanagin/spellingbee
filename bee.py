@@ -150,6 +150,8 @@ def build_dict(filename:str) -> int:
     #   just letters.
     #   no proper nouns.
     #   no more than 7 unique letters per word.
+    #  
+    # There is an additional constraint that 
     ###
     words = tuple(word for word in read_whitespace_file(filename) 
         if 's' not in word and
