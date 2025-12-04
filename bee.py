@@ -63,6 +63,15 @@ mypid = os.getpid()
 SQL = "INSERT INTO answers (middle_letter, puzzle, matches, pid) VALUES (?, ?, ?, ?)"
 start_time = time.time()
 verbose = False
+primes = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41,
+    43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97, 101 )
+d = dict(zip("abcdefghijklmnopqrstuvwxyz".split(), primes))
+
+def int_value(word:str) -> int:
+    v = 1
+    for c in word: v *= d[c]
+    return v
+
 
 def analyze_pangrams(pangrams:tuple, words:tuple) -> int:
     """
@@ -139,6 +148,9 @@ def build_dict(filename:str) -> int:
     the suffix .bee in $PWD.
     """
 
+    def int_value(word:str) ->
+
+
     ###
     # We are not going for efficiency here. This is only executed
     # once, and after this step the new file is the one used, and
@@ -166,6 +178,17 @@ def build_dict(filename:str) -> int:
         with contextlib.redirect_stdout(f):
             for word in words:
                 print(word)
+
+    d = {}
+    for word in words:
+        d[word] = (int_val(word),
+            int_val(str(set(word.split()))))
+
+
+
+    db = sqlitedb.SQLiteDB(bee.db)
+    for word in words
+
 
     return len(words)
 
